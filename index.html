@@ -152,21 +152,28 @@ section{position:relative;z-index:1}
 .car-indispo{opacity:.4;pointer-events:none;background:var(--surf2);
   color:var(--txt2);padding:9px 16px;border-radius:50px;font-size:.81rem;font-weight:600}
 
-/* ── MARQUES ── */
+/* ── MARQUES CARROUSEL ── */
 #marques{padding:56px 5%;background:var(--surf2)}
-.brands-scroll{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;
-  max-width:1100px;margin:0 auto;padding-bottom:60px}
-.brand-item{display:flex;flex-direction:column;align-items:center;gap:8px;
-  transition:transform .3s}
+.brands-carousel-wrapper{max-width:420px;margin:0 auto;padding-bottom:50px;position:relative}
+.brands-carousel-track-outer{overflow:hidden;border-radius:16px}
+.brands-carousel-track{display:flex;transition:transform .5s ease;width:100%}
+.brands-slide{display:flex;justify-content:center;gap:20px;min-width:100%;padding:10px 0}
+.brand-item{display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .3s}
 .brand-item:hover{transform:translateY(-5px)}
-.brand-logo{width:68px;height:68px;border-radius:13px;
+.brand-logo{width:88px;height:88px;border-radius:16px;
   display:flex;align-items:center;justify-content:center;
-  font-family:'DM Sans',sans-serif;font-size:.98rem;font-weight:800;
   box-shadow:0 4px 14px rgba(0,0,0,.14);border:1px solid rgba(0,0,0,.06);
-  background:#fff;overflow:hidden;padding:6px}
+  background:#fff;overflow:hidden;padding:8px}
 .brand-logo img{width:100%;height:100%;object-fit:contain;display:block}
-.brand-name{font-size:.68rem;font-weight:600;color:var(--txt2);
-  text-transform:uppercase;letter-spacing:.07em}
+.brand-name{font-size:.68rem;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.07em}
+.brands-controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:20px}
+.brands-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);background:#fff;
+  color:var(--accent);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .2s}
+.brands-btn:hover{background:var(--accent);color:#fff}
+.brands-dots{display:flex;gap:6px}
+.brands-dot{width:8px;height:8px;border-radius:50%;background:#ddd;cursor:pointer;transition:background .3s}
+.brands-dot.active{background:var(--accent);width:20px;border-radius:4px}
 
 /* ── FRANCHISE ── */
 #franchise{padding:62px 5%;text-align:center;
@@ -504,55 +511,78 @@ footer{background:var(--n);padding:38px 5% 22px;text-align:center}
     <h2 class="s-title">Grandes marques, large choix</h2>
     <div class="s-line"></div>
   </div>
-  <div class="brands-scroll fi">
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./hyundai.png" alt="Hyundai"></div>
-      <span class="brand-name">Hyundai</span>
+  <div class="brands-carousel-wrapper">
+    <div class="brands-carousel-track-outer">
+      <div class="brands-carousel-track" id="brandsTrack">
+
+        <div class="brands-slide">
+          <div class="brand-item"><div class="brand-logo"><img src="./hyundai.png" alt="Hyundai"></div><span class="brand-name">Hyundai</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./Renault.png" alt="Renault"></div><span class="brand-name">Renault</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./Dacia.png" alt="Dacia"></div><span class="brand-name">Dacia</span></div>
+        </div>
+
+        <div class="brands-slide">
+          <div class="brand-item"><div class="brand-logo"><img src="./Peugeot.png" alt="Peugeot"></div><span class="brand-name">Peugeot</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./Citroen.png" alt="Citroën"></div><span class="brand-name">Citroën</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./Volkswagen.png" alt="Volkswagen"></div><span class="brand-name">Volkswagen</span></div>
+        </div>
+
+        <div class="brands-slide">
+          <div class="brand-item"><div class="brand-logo"><img src="./Landrover.png" alt="Range Rover"></div><span class="brand-name">Range Rover</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./Opel.png" alt="Opel"></div><span class="brand-name">Opel</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./toyota.png" alt="Toyota"></div><span class="brand-name">Toyota</span></div>
+        </div>
+
+        <div class="brands-slide">
+          <div class="brand-item"><div class="brand-logo"><img src="./Cupra.png" alt="Cupra"></div><span class="brand-name">Cupra</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./kia.png" alt="KIA"></div><span class="brand-name">KIA</span></div>
+          <div class="brand-item"><div class="brand-logo"><img src="./Fiat.png" alt="Fiat"></div><span class="brand-name">Fiat</span></div>
+        </div>
+
+      </div>
     </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Renault.png" alt="Renault"></div>
-      <span class="brand-name">Renault</span>
+    <div class="brands-controls">
+      <button class="brands-btn" id="brandsPrev">&#8592;</button>
+      <div class="brands-dots" id="brandsDots"></div>
+      <button class="brands-btn" id="brandsNext">&#8594;</button>
     </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Dacia.png" alt="Dacia"></div>
-      <span class="brand-name">Dacia</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Peugeot.png" alt="Peugeot"></div>
-      <span class="brand-name">Peugeot</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Citroen.png" alt="Citroën"></div>
-      <span class="brand-name">Citroën</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Volkswagen.png" alt="Volkswagen"></div>
-      <span class="brand-name">Volkswagen</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Landrover.png" alt="Range Rover"></div>
-      <span class="brand-name">Range Rover</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Opel.png" alt="Opel"></div>
-      <span class="brand-name">Opel</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./toyota.png" alt="Toyota"></div>
-      <span class="brand-name">Toyota</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Cupra.png" alt="Cupra"></div>
-      <span class="brand-name">Cupra</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./kia.png" alt="KIA"></div>
-      <span class="brand-name">KIA</span>
-    </div>
-    <div class="brand-item">
-      <div class="brand-logo"><img src="./Fiat.png" alt="Fiat"></div>
-      <span class="brand-name">Fiat</span>
-    </div></div>
+  </div>
+  <script>
+  (function(){
+    var track = document.getElementById('brandsTrack');
+    var slides = track.querySelectorAll('.brands-slide');
+    var dotsContainer = document.getElementById('brandsDots');
+    var current = 0;
+    var total = slides.length;
+    var timer;
+
+    slides.forEach(function(_,i){
+      var dot = document.createElement('div');
+      dot.className = 'brands-dot' + (i===0?' active':'');
+      dot.addEventListener('click', function(){ goTo(i); });
+      dotsContainer.appendChild(dot);
+    });
+
+    function goTo(n){
+      current = (n + total) % total;
+      track.style.transform = 'translateX(-' + (current * 100) + '%)';
+      document.querySelectorAll('.brands-dot').forEach(function(d,i){
+        d.classList.toggle('active', i===current);
+      });
+      resetTimer();
+    }
+
+    function resetTimer(){
+      clearInterval(timer);
+      timer = setInterval(function(){ goTo(current+1); }, 3000);
+    }
+
+    document.getElementById('brandsPrev').addEventListener('click', function(){ goTo(current-1); });
+    document.getElementById('brandsNext').addEventListener('click', function(){ goTo(current+1); });
+
+    resetTimer();
+  })();
+  </script>
 </section>
 
 <section id="franchise" class="fi">

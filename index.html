@@ -1408,6 +1408,9 @@ async function publierGitHub(){
     var sha=info.sha;
 
     // 2. Lire le HTML actuel de la page
+    // Fermer l'admin avant de capturer pour ne pas le publier ouvert
+    document.getElementById('admin-panel').classList.remove('on');
+    document.getElementById('admin-gate').classList.remove('on');
     var htmlContent=document.documentElement.outerHTML;
 
     // 3. Encoder en Base64

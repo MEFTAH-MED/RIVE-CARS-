@@ -1373,13 +1373,77 @@ function toggleNav(){
 var _origAdmin=typeof ouvrirAdmin==='function'?ouvrirAdmin:null;
 ouvrirAdmin=function(){if(_origAdmin)_origAdmin();buildTextsAdmin();};
 
+// Convertir du texte UTF-8 en Base64 sans planter avec les gros fichiers / accents / emojis
+function encodeBase64Utf8(str){
+  const bytes=new TextEncoder().encode(str);
+  let binary='';
+  const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk){
+    binary+=String.fromCharCode.apply(null,bytes.subarray(i,i+chunk));
+  }
+  return btoa(binary);
+}
+
+// Décoder le contenu GitHub proprement
+function decodeBase64Utf8(str){
+  const clean=(str||'').replace(/\n/g,'');
+  const binary=atob(clean);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+// Sécuriser JSON dans une balise <script>
+function safeJsonForScript(obj){
+  return JSON.stringify(obj,null,2)
+    .replace(/<\/script/gi,'<\\/script')
+    .replace(/<!--/g,'<\\!--');
+}
+
+// Reconstruire le HTML publié avec les vraies données sauvegardées en admin
+function buildHtmlForPublication(sourceHtml){
+  const cars=getCars();
+  const cfg=getConfig();
+
+  let html=sourceHtml;
+
+  // 1) Injecter la configuration admin dans DEFAULT_CONFIG
+  html=html.replace(
+    /const\s+DEFAULT_CONFIG\s*=\s*\{[\s\S]*?\};/,
+    'const DEFAULT_CONFIG = '+safeJsonForScript(cfg)+';'
+  );
+
+  // 2) Injecter la flotte admin/localStorage dans DEFAULT_CARS
+  html=html.replace(
+    /const\s+DEFAULT_CARS\s*=\s*\[[\s\S]*?\];\s*(?=\/\/ ══════════════════════════════════════\s*\n\/\/ STOCKAGE LOCAL)/,
+    'const DEFAULT_CARS = '+safeJsonForScript(cars)+';\n\n'
+  );
+
+  // 3) Injecter aussi les textes modifiés dans le HTML statique
+  try{
+    const doc=new DOMParser().parseFromString(html,'text/html');
+    EDITABLE_TEXTS.forEach(function(t){
+      const saved=localStorage.getItem('rc_txt_'+t.id);
+      if(saved){
+        const el=doc.getElementById(t.id);
+        if(el)el.textContent=saved;
+      }
+    });
+    html='<!DOCTYPE html>\n'+doc.documentElement.outerHTML;
+  }catch(e){
+    console.warn('Injection textes ignorée :',e);
+  }
+
+  return html;
+}
+
 // ══════════════════════════════════════
 // PUBLIER SUR GITHUB
 // ══════════════════════════════════════
 async function publierGitHub(btnEl){
   var btn=btnEl||document.querySelector('[onclick*="publierGitHub"]');
   var texteOriginal=btn?btn.textContent:'🚀 Publier sur GitHub';
-  // Demander le token si pas encore sauvegardé
+
   var token=localStorage.getItem('gh_token')||'';
   if(!token){
     token=prompt('🔑 Entrez votre token GitHub\n(Settings → Developer settings → Personal access tokens)');
@@ -1388,34 +1452,41 @@ async function publierGitHub(btnEl){
     localStorage.setItem('gh_token',token);
   }
 
-  var repo='MEFTAH-MED/RIVE-CARS-';
+  // ⚠️ Vérifie bien le nom du repo. Ici il y a un tiret à la fin : RIVE-CARS-
+  var repo=(localStorage.getItem('gh_repo')||'MEFTAH-MED/RIVE-CARS-').trim();
   var fichier='index.html';
   var branche='main';
 
   if(btn){btn.textContent='⏳ Publication...';btn.disabled=true;}
 
   try{
-    // 1. Récupérer le SHA actuel du fichier
+    // 1. Récupérer le fichier actuel depuis GitHub, pas depuis le DOM affiché
     var resp=await fetch('https://api.github.com/repos/'+repo+'/contents/'+fichier+'?ref='+branche,{
       headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
     });
+
     if(!resp.ok){
-      if(resp.status===401){localStorage.removeItem('gh_token');}
+      if(resp.status===401)localStorage.removeItem('gh_token');
+      if(resp.status===404){
+        var nouveauRepo=prompt('Repository introuvable. Vérifie le nom du repo GitHub :',repo);
+        if(nouveauRepo){localStorage.setItem('gh_repo',nouveauRepo.trim());}
+      }
       throw new Error('Erreur GitHub '+resp.status+' : '+resp.statusText);
     }
+
     var info=await resp.json();
     var sha=info.sha;
 
-    // 2. Lire le HTML actuel de la page
-    // Fermer l'admin avant de capturer pour ne pas le publier ouvert
-    document.getElementById('admin-panel').classList.remove('on');
-    document.getElementById('admin-gate').classList.remove('on');
-    var htmlContent=document.documentElement.outerHTML;
+    // 2. Décoder le HTML propre depuis GitHub
+    var sourceHtml=decodeBase64Utf8(info.content);
 
-    // 3. Encoder en Base64
-    var encoded=btoa(unescape(encodeURIComponent(htmlContent)));
+    // 3. Reconstruire le HTML avec les données admin/localStorage
+    var htmlContent=buildHtmlForPublication(sourceHtml);
 
-    // 4. Envoyer la mise à jour
+    // 4. Encoder proprement, compatible gros fichiers + accents + emojis
+    var encoded=encodeBase64Utf8(htmlContent);
+
+    // 5. Envoyer la mise à jour sur GitHub
     var update=await fetch('https://api.github.com/repos/'+repo+'/contents/'+fichier,{
       method:'PUT',
       headers:{
@@ -1424,7 +1495,7 @@ async function publierGitHub(btnEl){
         'Content-Type':'application/json'
       },
       body:JSON.stringify({
-        message:'✏️ Mise à jour depuis admin Rive Cars',
+        message:'✏️ Mise à jour flotte/config depuis admin Rive Cars',
         content:encoded,
         sha:sha,
         branch:branche
@@ -1432,25 +1503,29 @@ async function publierGitHub(btnEl){
     });
 
     if(!update.ok){
-      var err=await update.json();
+      var err=await update.json().catch(function(){return {message:'Erreur lors de la publication'}});
       throw new Error(err.message||'Erreur lors de la publication');
     }
 
-    btn.textContent='✅ Publié !';
-    btn.style.background='linear-gradient(135deg,#0969da,#0550ae)';
-    setTimeout(function(){
-      btn.textContent=texteOriginal;
-      btn.style.background='linear-gradient(135deg,#2ea44f,#22863a)';
-      btn.disabled=false;
-    },3000);
+    if(btn){
+      btn.textContent='✅ Publié !';
+      btn.style.background='linear-gradient(135deg,#0969da,#0550ae)';
+      setTimeout(function(){
+        btn.textContent=texteOriginal;
+        btn.style.background='linear-gradient(135deg,#2ea44f,#22863a)';
+        btn.disabled=false;
+      },3000);
+    }
 
-    alert('✅ Site publié sur GitHub avec succès !\n\nLe site sera mis à jour dans 1 à 2 minutes.');
+    alert('✅ Site publié sur GitHub avec succès !\n\nLes voitures, photos, textes et infos de contact sont maintenant écrits dans index.html. GitHub Pages peut prendre 1 à 2 minutes pour afficher la mise à jour.');
 
   }catch(e){
-    btn.textContent='❌ Erreur';
-    btn.disabled=false;
-    setTimeout(function(){btn.textContent=texteOriginal;btn.disabled=false;},2000);
-    alert('❌ Erreur : '+e.message+'\n\nVérifiez votre token GitHub.');
+    if(btn){
+      btn.textContent='❌ Erreur';
+      btn.disabled=false;
+      setTimeout(function(){btn.textContent=texteOriginal;btn.disabled=false;},2000);
+    }
+    alert('❌ Erreur : '+e.message+'\n\nÀ vérifier : token GitHub, droits repo, nom du repo, branche main.');
     console.error(e);
   }
 }

@@ -1251,9 +1251,9 @@ function renderAdminTable(){
       <td class="td-price">${Number(car.prix).toLocaleString('fr-MA')} MAD</td>
       <td class="td-dispo"><span class="${car.dispo?'oui':'non'}">${car.dispo?'✅':'❌'}</span></td>
       <td><div class="td-actions">
-        <button class="btn-edit" onclick="editerVoiture(${car.id})">✏️</button>
-        <button class="btn-toggle" onclick="toggleDispo(${car.id})">${car.dispo?'❌':'✅'}</button>
-        <button class="btn-del" onclick="supprimerVoiture(${car.id})">🗑️</button>
+        <button class="btn-edit" onclick="editerVoiture('${car.id}')">✏️</button>
+        <button class="btn-toggle" onclick="toggleDispo('${car.id}')">${car.dispo?'❌':'✅'}</button>
+        <button class="btn-del" onclick="supprimerVoiture('${car.id}')">🗑️</button>
       </div></td>`;
     tbody.appendChild(tr);
   });

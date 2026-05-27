@@ -3,7 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Rive Cars — Location de Voitures Casablanca</title>
+<title>Rive Cars — Location de Voitures Casablanca & Aéroport Mohammed V</title>
+<meta name="description" content="Rive Cars — Location de voitures à Casablanca et à l'aéroport Mohammed V. Économique, SUV, Premium. Livraison 24h/7j, sans caution bloquée. +212 671 602 794">
+<meta name="keywords" content="location voiture Casablanca, location voiture aéroport Mohammed V, location voiture Deroua, Rive Cars, louer voiture Maroc, location SUV Casablanca">
+<meta name="author" content="Rive Cars">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://rivecars.ma/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rive Cars — Location de Voitures Casablanca">
+<meta property="og:description" content="Location de voitures à Casablanca & Aéroport Mohammed V. Livraison 24h/7j, sans caution bloquée.">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoRental",
+  "name": "Rive Cars",
+  "image": "https://logo.clearbit.com/rivecars.ma",
+  "description": "Location de voitures à Casablanca et à l'aéroport Mohammed V. Économique, SUV, Premium. Livraison 24h/7j, sans caution bloquée.",
+  "url": "https://rivecars.ma/",
+  "telephone": "+212671602794",
+  "priceRange": "$$",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Deroua",
+    "addressLocality": "Casablanca",
+    "addressCountry": "MA"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": 33.3849, "longitude": -7.5325 },
+  "openingHoursSpecification": [{
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+    "opens": "00:00", "closes": "23:59"
+  }],
+  "areaServed": ["Casablanca","Aéroport Mohammed V","Deroua","Mohammedia","Settat"],
+  "sameAs": ["https://wa.me/212671602794"]
+}
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -170,28 +206,24 @@ section{position:relative;z-index:1}
 .car-indispo{opacity:.4;pointer-events:none;background:var(--surf2);
   color:var(--txt2);padding:9px 16px;border-radius:50px;font-size:.81rem;font-weight:600}
 
-/* ── MARQUES CARROUSEL ── */
-#marques{padding:56px 5%;background:var(--surf2)}
-.brands-carousel-wrapper{max-width:420px;margin:0 auto;padding-bottom:50px;position:relative}
-.brands-carousel-track-outer{overflow:hidden;border-radius:16px}
-.brands-carousel-track{display:flex;transition:transform .5s ease;width:100%}
-.brands-slide{display:flex;justify-content:center;gap:20px;min-width:100%;padding:10px 0}
-.brand-item{display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .3s}
-.brand-item:hover{transform:translateY(-5px)}
-.brand-logo{width:88px;height:88px;border-radius:16px;
+/* ── MARQUES MARQUEE (continuous) ── */
+#marques{padding:56px 0;background:var(--surf2)}
+.brands-marquee{position:relative;overflow:hidden;width:100%;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.brands-track{display:flex;gap:38px;width:max-content;
+  animation:brandsScroll 38s linear infinite;padding:14px 0}
+.brands-marquee:hover .brands-track{animation-play-state:paused}
+@keyframes brandsScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.brand-item{display:flex;flex-direction:column;align-items:center;gap:10px;flex:0 0 auto}
+.brand-logo{width:140px;height:140px;border-radius:22px;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 14px rgba(0,0,0,.14);border:1px solid rgba(0,0,0,.06);
-  background:#fff;overflow:hidden;padding:8px}
+  box-shadow:0 8px 24px rgba(0,0,0,.10);border:1px solid rgba(0,0,0,.06);
+  background:#fff;overflow:hidden;padding:18px;transition:transform .3s, box-shadow .3s}
+.brand-item:hover .brand-logo{transform:translateY(-6px);box-shadow:0 14px 34px rgba(0,0,0,.16)}
 .brand-logo img{width:100%;height:100%;object-fit:contain;display:block}
-.brand-name{font-size:.68rem;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.07em}
-.brands-controls{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:20px}
-.brands-btn{width:36px;height:36px;border-radius:50%;border:2px solid var(--accent);background:#fff;
-  color:var(--accent);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .2s}
-.brands-btn:hover{background:var(--accent);color:#fff}
-.brands-dots{display:flex;gap:6px}
-.brands-dot{width:8px;height:8px;border-radius:50%;background:#ddd;cursor:pointer;transition:background .3s}
-.brands-dot.active{background:var(--accent);width:20px;border-radius:4px}
+.brand-name{font-size:.78rem;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.08em}
+@media(max-width:640px){.brand-logo{width:108px;height:108px;padding:14px}.brands-track{gap:26px}}
 
 /* ── FRANCHISE ── */
 #franchise{padding:62px 5%;text-align:center;
@@ -480,8 +512,9 @@ footer{background:var(--n);padding:38px 5% 22px;text-align:center}
     <a href="#flotte">Flotte</a>
     <a href="#marques">Marques</a>
     <a href="#livraisons">Livraisons</a>
-    <a href="#pourquoi">Pourquoi nous</a>
-    <a href="#contact">Contact</a>
+     <a href="#pourquoi">Pourquoi nous</a>
+     <a href="#avis">Avis</a>
+     <a href="#contact">Contact</a>
     <a href="javascript:void(0)" onclick="ouvrirWA('Bonjour Rive Cars 👋 Je souhaite louer une voiture.')" class="nav-wa">
       <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp
     </a>
@@ -529,76 +562,28 @@ footer{background:var(--n);padding:38px 5% 22px;text-align:center}
     <h2 class="s-title">Grandes marques, large choix</h2>
     <div class="s-line"></div>
   </div>
-  <div class="brands-carousel-wrapper">
-    <div class="brands-carousel-track-outer">
-      <div class="brands-carousel-track" id="brandsTrack">
-
-        <div class="brands-slide">
-          <div class="brand-item"><div class="brand-logo"><img src="./hyundai.png" alt="Hyundai"></div><span class="brand-name">Hyundai</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./Renault.png" alt="Renault"></div><span class="brand-name">Renault</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./Dacia.png" alt="Dacia"></div><span class="brand-name">Dacia</span></div>
-        </div>
-
-        <div class="brands-slide">
-          <div class="brand-item"><div class="brand-logo"><img src="./Peugeot.png" alt="Peugeot"></div><span class="brand-name">Peugeot</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./Citroen.png" alt="Citroën"></div><span class="brand-name">Citroën</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./Volkswagen.png" alt="Volkswagen"></div><span class="brand-name">Volkswagen</span></div>
-        </div>
-
-        <div class="brands-slide">
-          <div class="brand-item"><div class="brand-logo"><img src="./Landrover.png" alt="Range Rover"></div><span class="brand-name">Range Rover</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./Opel.png" alt="Opel"></div><span class="brand-name">Opel</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./toyota.png" alt="Toyota"></div><span class="brand-name">Toyota</span></div>
-        </div>
-
-        <div class="brands-slide">
-          <div class="brand-item"><div class="brand-logo"><img src="./Cupra.png" alt="Cupra"></div><span class="brand-name">Cupra</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./kia.png" alt="KIA"></div><span class="brand-name">KIA</span></div>
-          <div class="brand-item"><div class="brand-logo"><img src="./Fiat.png" alt="Fiat"></div><span class="brand-name">Fiat</span></div>
-        </div>
-
-      </div>
-    </div>
-    <div class="brands-controls">
-      <button class="brands-btn" id="brandsPrev">&#8592;</button>
-      <div class="brands-dots" id="brandsDots"></div>
-      <button class="brands-btn" id="brandsNext">&#8594;</button>
+  <div class="brands-marquee">
+    <div class="brands-track" id="brandsTrack">
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/hyundai.svg" alt="Hyundai" loading="lazy"></div><span class="brand-name">Hyundai</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/renault.svg" alt="Renault" loading="lazy"></div><span class="brand-name">Renault</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/dacia.svg" alt="Dacia" loading="lazy"></div><span class="brand-name">Dacia</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/peugeot.svg" alt="Peugeot" loading="lazy"></div><span class="brand-name">Peugeot</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/citroen.svg" alt="Citroën" loading="lazy"></div><span class="brand-name">Citroën</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/volkswagen.svg" alt="Volkswagen" loading="lazy"></div><span class="brand-name">Volkswagen</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/landrover.svg" alt="Range Rover" loading="lazy"></div><span class="brand-name">Range Rover</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/opel.svg" alt="Opel" loading="lazy"></div><span class="brand-name">Opel</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/toyota.svg" alt="Toyota" loading="lazy"></div><span class="brand-name">Toyota</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/seat.svg" alt="Cupra" loading="lazy"></div><span class="brand-name">Cupra</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/kia.svg" alt="KIA" loading="lazy"></div><span class="brand-name">KIA</span></div>
+      <div class="brand-item"><div class="brand-logo"><img src="https://cdn.jsdelivr.net/npm/simple-icons@13/icons/fiat.svg" alt="Fiat" loading="lazy"></div><span class="brand-name">Fiat</span></div>
     </div>
   </div>
   <script>
   (function(){
+    // Duplicate items to create a seamless infinite loop
     var track = document.getElementById('brandsTrack');
-    var slides = track.querySelectorAll('.brands-slide');
-    var dotsContainer = document.getElementById('brandsDots');
-    var current = 0;
-    var total = slides.length;
-    var timer;
-
-    slides.forEach(function(_,i){
-      var dot = document.createElement('div');
-      dot.className = 'brands-dot' + (i===0?' active':'');
-      dot.addEventListener('click', function(){ goTo(i); });
-      dotsContainer.appendChild(dot);
-    });
-
-    function goTo(n){
-      current = (n + total) % total;
-      track.style.transform = 'translateX(-' + (current * 100) + '%)';
-      document.querySelectorAll('.brands-dot').forEach(function(d,i){
-        d.classList.toggle('active', i===current);
-      });
-      resetTimer();
-    }
-
-    function resetTimer(){
-      clearInterval(timer);
-      timer = setInterval(function(){ goTo(current+1); }, 3000);
-    }
-
-    document.getElementById('brandsPrev').addEventListener('click', function(){ goTo(current-1); });
-    document.getElementById('brandsNext').addEventListener('click', function(){ goTo(current+1); });
-
-    resetTimer();
+    if(!track) return;
+    track.innerHTML = track.innerHTML + track.innerHTML;
   })();
   </script>
 </section>
@@ -664,6 +649,68 @@ footer{background:var(--n);padding:38px 5% 22px;text-align:center}
   </div>
 </section>
 
+<style>
+.reviews-wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+.reviews-head{text-align:center;margin-bottom:36px}
+.reviews-rating{display:inline-flex;align-items:center;gap:10px;background:#fff;padding:12px 22px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.06);margin-top:14px}
+.reviews-rating .stars{color:#FFB400;letter-spacing:2px;font-size:1.1rem}
+.reviews-rating .score{font-weight:700;color:var(--txt)}
+.reviews-rating .count{color:var(--txt2);font-size:.9rem}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px}
+.review-card{background:#fff;border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(0,0,0,.06);border:1px solid var(--brd);display:flex;flex-direction:column;gap:12px;transition:transform .25s ease,box-shadow .25s ease}
+.review-card:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(0,0,0,.10)}
+.review-top{display:flex;align-items:center;gap:12px}
+.review-avatar{width:44px;height:44px;border-radius:50%;background:var(--r);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Cormorant Garamond',serif;font-size:1.2rem}
+.review-meta strong{display:block;color:var(--txt);font-size:.98rem}
+.review-meta .when{color:var(--txt2);font-size:.8rem}
+.review-stars{color:#FFB400;letter-spacing:2px;font-size:.95rem}
+.review-text{color:var(--txt2);line-height:1.55;font-size:.95rem}
+.review-gbadge{display:inline-flex;align-items:center;gap:6px;color:var(--txt2);font-size:.78rem;margin-top:auto}
+.review-gbadge svg{width:14px;height:14px}
+.reviews-cta{text-align:center;margin-top:28px}
+.btn-reviews{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--txt);border:1px solid var(--brd);padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600;transition:all .2s ease}
+.btn-reviews:hover{background:var(--r);color:#fff;border-color:var(--r)}
+</style>
+<section id="avis" style="padding:78px 0;background:var(--bg)">
+  <div class="reviews-wrap">
+    <div class="s-header fi reviews-head">
+      <span class="s-tag">Ils nous font confiance</span>
+      <h2 class="s-title">Avis de nos clients</h2>
+      <div class="s-line"></div>
+      <div class="reviews-rating">
+        <span class="stars">★★★★★</span>
+        <span class="score">4.9 / 5</span>
+        <span class="count">· basé sur Google Reviews</span>
+      </div>
+    </div>
+    <div class="reviews-grid fi">
+      <div class="review-card">
+        <div class="review-top"><div class="review-avatar">Y</div><div class="review-meta"><strong>Youssef A.</strong><span class="when">il y a 2 semaines</span></div></div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Service impeccable, voiture propre et livrée directement à l'aéroport. Très professionnels, je recommande vivement Rive Cars !</p>
+        <span class="review-gbadge"><svg viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.9-6.9C35.9 2.4 30.5 0 24 0 14.6 0 6.5 5.4 2.6 13.2l8 6.2C12.5 13.3 17.8 9.5 24 9.5z"/><path fill="#34A853" d="M46.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.9 7.2l7.6 5.9c4.4-4.1 7.1-10.2 7.1-17.4z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-8-6.2C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l8-6.2z"/><path fill="#EA4335" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.2 0-11.5-3.8-13.4-9.1l-8 6.2C6.5 42.6 14.6 48 24 48z"/></svg> Google</span>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="review-avatar">S</div><div class="review-meta"><strong>Sofia M.</strong><span class="when">il y a 1 mois</span></div></div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">Sans caution bloquée, ça change tout ! Voiture récente, climatisation parfaite et accueil très chaleureux. Merci à toute l'équipe.</p>
+        <span class="review-gbadge"><svg viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.9-6.9C35.9 2.4 30.5 0 24 0 14.6 0 6.5 5.4 2.6 13.2l8 6.2C12.5 13.3 17.8 9.5 24 9.5z"/><path fill="#34A853" d="M46.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.9 7.2l7.6 5.9c4.4-4.1 7.1-10.2 7.1-17.4z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-8-6.2C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l8-6.2z"/><path fill="#EA4335" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.2 0-11.5-3.8-13.4-9.1l-8 6.2C6.5 42.6 14.6 48 24 48z"/></svg> Google</span>
+      </div>
+      <div class="review-card">
+        <div class="review-top"><div class="review-avatar">K</div><div class="review-meta"><strong>Karim B.</strong><span class="when">il y a 3 semaines</span></div></div>
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">J'ai loué un SUV pour un week-end en famille. Tout était parfait, prix très correct et réservation simple via WhatsApp. Top !</p>
+        <span class="review-gbadge"><svg viewBox="0 0 48 48"><path fill="#4285F4" d="M24 9.5c3.54 0 6.7 1.22 9.2 3.6l6.9-6.9C35.9 2.4 30.5 0 24 0 14.6 0 6.5 5.4 2.6 13.2l8 6.2C12.5 13.3 17.8 9.5 24 9.5z"/><path fill="#34A853" d="M46.5 24.5c0-1.6-.1-3.2-.4-4.7H24v9h12.7c-.6 3-2.3 5.5-4.9 7.2l7.6 5.9c4.4-4.1 7.1-10.2 7.1-17.4z"/><path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-2.9-.8-4.6s.3-3.2.8-4.6l-8-6.2C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l8-6.2z"/><path fill="#EA4335" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.2 0-11.5-3.8-13.4-9.1l-8 6.2C6.5 42.6 14.6 48 24 48z"/></svg> Google</span>
+      </div>
+    </div>
+    <div class="reviews-cta fi">
+      <a class="btn-reviews" href="https://www.google.com/search?q=Rive+Cars+Deroua+Casablanca" target="_blank" rel="noopener">
+        ⭐ Voir tous les avis sur Google
+      </a>
+    </div>
+  </div>
+</section>
+
 <section id="localisation">
   <div class="s-header fi" style="padding-top:78px">
     <span class="s-tag">Notre agence</span>
@@ -693,7 +740,7 @@ footer{background:var(--n);padding:38px 5% 22px;text-align:center}
     <a href="#flotte">Flotte</a><a href="#marques">Marques</a>
     <a href="#livraisons">Livraisons</a><a href="#pourquoi">Pourquoi nous</a>
     <a href="#localisation">Localisation</a><a href="#contact">Contact</a>
-    <a href="javascript:void(0)" onclick="ouvrirAdminGate()">⚙️ Admin</a>
+    <a href="javascript:void(0)" onclick="ouvrirAdminGate()" title="" aria-label="." style="opacity:.35;font-size:.7rem;letter-spacing:.1em;color:var(--txt2);text-decoration:none">·</a>
   </div>
   <p class="foot-copy">© 2025 Rive Cars — Deroua, Casablanca • Tous droits réservés</p>
 </footer>

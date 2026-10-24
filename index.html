@@ -8,7 +8,7 @@
 <meta name="keywords" content="location voiture Casablanca, location voiture aéroport Mohammed V, location voiture Deroua, Rive Cars, louer voiture Maroc, location SUV Casablanca">
 <meta name="author" content="Rive Cars">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://rivecars.ma/">
+<link rel="canonical" href="https://rivecarsmorocco.com/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Rive Cars — Location de Voitures Casablanca">
 <meta property="og:description" content="Location de voitures à Casablanca & Aéroport Mohammed V. Livraison 24h/7j, sans caution bloquée.">
@@ -500,6 +500,25 @@ footer{background:var(--n);padding:38px 5% 22px;text-align:center}
   .admin-fg-row,.fg-row{grid-template-columns:1fr}
   .map-wrapper{grid-template-columns:1fr}.map-frame{height:250px}
 }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style id="pro-theme">
+:root{--r:#C8102E;--r2:#E0243F;--r3:#8E0B20;--b:#0F1E3D;--b2:#1E3A70;--n:#0B1528;--n2:#132344;
+--bg:#F4F6FA;--surf:#FFFFFF;--surf2:#EAEEF5;--txt:#1A2233;--txt2:#5B6478;--brd:#DDE2EC}
+body{font-family:'Inter','DM Sans',sans-serif;background:linear-gradient(180deg,#F4F6FA,#E9ECF2);letter-spacing:.1px}
+h1,h2,h3,.s-title,.franchise-title,.car-name{font-family:'Montserrat',sans-serif!important;letter-spacing:-.3px}
+nav{background:rgba(15,30,61,.96)!important;backdrop-filter:blur(10px);border-bottom:3px solid var(--r)!important;box-shadow:0 4px 20px rgba(11,21,40,.25)}
+nav a{color:#E6EAF2!important} nav a:hover{color:#fff!important}
+.hero{background:linear-gradient(135deg,rgba(11,21,40,.92),rgba(30,58,112,.80))!important}
+.hero h1{color:#fff} .s-title{color:var(--b)!important}
+.s-title::after{content:"";display:block;width:56px;height:3px;background:var(--r);margin:14px auto 0;border-radius:2px}
+.car-card,.av-card,.brand-item{border:1px solid var(--brd)!important;border-radius:14px!important;box-shadow:0 6px 22px rgba(15,30,61,.07)!important;transition:transform .25s,box-shadow .25s}
+.car-card:hover,.av-card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(15,30,61,.15)!important}
+.btn-primary,.btn-res{background:linear-gradient(135deg,var(--r),var(--r3))!important;border-radius:10px!important;box-shadow:0 6px 18px rgba(200,16,46,.3)}
+.btn-secondary{border-radius:10px!important;border-color:#fff!important}
+#franchise,#contact{background:linear-gradient(135deg,#0F1E3D,#1E3A70)!important;color:#fff}
+#franchise *,#contact h2{color:inherit}
+footer{background:#0B1528!important;color:#AEB6C8;border-top:3px solid var(--r)}
 </style>
 </head>
 <body>
@@ -1260,8 +1279,9 @@ async function checkLogin(){
   const pwd=document.getElementById('admin-pwd').value;
   const email=(getConfig().email||'').trim() || 'Rive.cars@gmail.com';
   try{
-    const { error } = await sb.auth.signInWithPassword({email, password: pwd});
-    if(error) throw error;
+    const saved=localStorage.getItem('rc_admin_pwd')||'RiveCars2026';
+    if(pwd!==saved) throw new Error('Mot de passe incorrect');
+    sessionStorage.setItem('rc_admin','1');
     fermerGate();
     await loadCarsFromCloud();
     await loadConfigFromCloud();
@@ -1274,7 +1294,7 @@ async function checkLogin(){
   }
 }
 async function logout(){
-  await sb.auth.signOut();
+  sessionStorage.removeItem('rc_admin');
   document.getElementById('admin-panel').classList.remove('on');
   showToast('Déconnexion réussie');
 }
@@ -1304,8 +1324,7 @@ async function sauvegarderConfig(){
   try{
     await saveConfigToCloud(newCfg);
     if(newPwd){
-      const { error } = await sb.auth.updateUser({password: newPwd});
-      if(error) throw error;
+      localStorage.setItem('rc_admin_pwd', newPwd);
     }
     showToast('✅ Configuration enregistrée !');
     document.getElementById('cfg-pwd').value='';
@@ -1749,6 +1768,24 @@ loadSavedTexts();
   await loadConfigFromCloud();
   await loadCarsFromCloud();
   renderCars();
+})();
+</script>
+
+<script>
+// Mode autonome : sauvegarde locale si le serveur est indisponible
+(function(){
+  const LC='rc_local_cars', LF='rc_local_cfg';
+  const lc=()=>JSON.parse(localStorage.getItem(LC)||'null');
+  const sc=()=>localStorage.setItem(LC,JSON.stringify(_cars));
+  const _load=loadCarsFromCloud, _loadC=loadConfigFromCloud;
+  loadCarsFromCloud=async function(){ const l=lc(); if(l){_cars=l;return;} try{await _load();}catch(e){} };
+  loadConfigFromCloud=async function(){ try{await _loadC();}catch(e){} const f=JSON.parse(localStorage.getItem(LF)||'null'); if(f) _config={..._config,...f}; };
+  saveCarToCloud=async function(car){ const id=car.id||('l'+Date.now()); const i=_cars.findIndex(c=>c.id===car.id); const n={...car,id}; if(i>=0)_cars[i]=n; else _cars.push(n); sc(); return id; };
+  deleteCarFromCloud=async function(id){ _cars=_cars.filter(c=>c.id!==id); sc(); };
+  toggleDispoCloud=async function(id,d){ const c=_cars.find(c=>c.id===id); if(c)c.dispo=d; sc(); };
+  saveConfigToCloud=async function(cfg){ _config={..._config,...cfg}; localStorage.setItem(LF,JSON.stringify(cfg)); };
+  uploadCarImage=function(file){ return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);}); };
+  const l=lc(); if(l){_cars=l; try{renderCars();}catch(e){}}
 })();
 </script>
 </body>

@@ -520,6 +520,7 @@ nav a{color:#E6EAF2!important} nav a:hover{color:#fff!important}
 #franchise *,#contact h2{color:inherit}
 footer{background:#0B1528!important;color:#AEB6C8;border-top:3px solid var(--r)}
 </style>
+<style id="photo-fix">.car-thumb{height:auto!important;aspect-ratio:16/10;background:#0F1E3D}.car-thumb img{object-fit:cover;object-position:center}</style>
 </head>
 <body>
 
@@ -1235,7 +1236,7 @@ function renderCars(){
 let resCarId=null;
 function ouvrirReservation(id){
   resCarId=id;
-  const car=getCars().find(c=>c.id===id);
+  const car=getCars().find(c=>String(c.id)===String(id));
   if(!car)return;
   document.getElementById('res-car-label').textContent=car.nom+' — '+Number(car.prix).toLocaleString('fr-MA')+' MAD/jour';
   const t=new Date().toISOString().split('T')[0];
@@ -1359,7 +1360,7 @@ function renderAdminTable(){
 }
 
 async function toggleDispo(id){
-  const car=getCars().find(c=>c.id===id);
+  const car=getCars().find(c=>String(c.id)===String(id));
   if(!car)return;
   const newDispo = car.dispo?0:1;
   try{
@@ -1411,6 +1412,7 @@ async function handlePhotoUpload(input){
     document.getElementById('car-img-data').value=url;
     document.getElementById('photoPreviewImg').src=url;
     document.getElementById('photoPreview').style.display='flex';
+    document.getElementById('uploadZone').style.display='none';
     showToast('✅ Photo uploadée');
   }catch(e){
     console.error(e);
@@ -1453,7 +1455,7 @@ function ouvrirModalVoiture(id=null){
   document.getElementById('car-edit-id').value=id||'';
   resetPhotoFields();
   if(id){
-    const car=getCars().find(c=>c.id===id);
+    const car=getCars().find(c=>String(c.id)===String(id));
     if(car){
       document.getElementById('car-nom').value=car.nom;
       document.getElementById('car-cat').value=car.cat;
@@ -1501,7 +1503,7 @@ async function sauvegarderVoiture(){
   if(!nom||!prix){showToast('⚠️ Nom et prix obligatoires');return}
   const cars=getCars();
   const editIdRaw=document.getElementById('car-edit-id').value;
-  const editId = editIdRaw && editIdRaw.length > 20 ? editIdRaw : null;
+  const editId = editIdRaw ? editIdRaw : null;
   // Photo : priorité à la donnée base64, sinon URL/emoji
   const photoData=document.getElementById('car-img-data').value;
   const photoUrl=document.getElementById('car-img').value.trim();
@@ -1776,15 +1778,15 @@ loadSavedTexts();
 (function(){
   const LC='rc_local_cars', LF='rc_local_cfg';
   const lc=()=>JSON.parse(localStorage.getItem(LC)||'null');
-  const sc=()=>localStorage.setItem(LC,JSON.stringify(_cars));
+  const sc=()=>{try{localStorage.setItem(LC,JSON.stringify(_cars));}catch(e){alert('⚠️ Mémoire pleine : supprimez des photos anciennes ou utilisez des photos plus légères.');throw e;}};
   const _load=loadCarsFromCloud, _loadC=loadConfigFromCloud;
   loadCarsFromCloud=async function(){ const l=lc(); if(l){_cars=l;return;} try{await _load();}catch(e){} };
   loadConfigFromCloud=async function(){ try{await _loadC();}catch(e){} const f=JSON.parse(localStorage.getItem(LF)||'null'); if(f) _config={..._config,...f}; };
-  saveCarToCloud=async function(car){ const id=car.id||('l'+Date.now()); const i=_cars.findIndex(c=>c.id===car.id); const n={...car,id}; if(i>=0)_cars[i]=n; else _cars.push(n); sc(); return id; };
-  deleteCarFromCloud=async function(id){ _cars=_cars.filter(c=>c.id!==id); sc(); };
-  toggleDispoCloud=async function(id,d){ const c=_cars.find(c=>c.id===id); if(c)c.dispo=d; sc(); };
+  saveCarToCloud=async function(car){ const id=car.id||('l'+Date.now()); const i=_cars.findIndex(c=>String(c.id)===String(car.id)); const n={...car,id}; if(i>=0)_cars[i]=n; else _cars.push(n); sc(); return id; };
+  deleteCarFromCloud=async function(id){ _cars=_cars.filter(c=>String(c.id)!==String(id)); sc(); };
+  toggleDispoCloud=async function(id,d){ const c=_cars.find(c=>String(c.id)===String(id)); if(c)c.dispo=d; sc(); };
   saveConfigToCloud=async function(cfg){ _config={..._config,...cfg}; localStorage.setItem(LF,JSON.stringify(cfg)); };
-  uploadCarImage=function(file){ return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);}); };
+  uploadCarImage=function(file){ return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=()=>{const im=new Image();im.onerror=()=>rej(new Error('Image illisible'));im.onload=()=>{const M=1400;let w=im.width,h=im.height;if(w>M){h=Math.round(h*M/w);w=M;}const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);res(cv.toDataURL('image/jpeg',0.8));};im.src=r.result;};r.readAsDataURL(file);}); };
   const l=lc(); if(l){_cars=l; try{renderCars();}catch(e){}}
 })();
 </script>

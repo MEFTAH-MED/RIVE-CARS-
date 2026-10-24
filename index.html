@@ -827,6 +827,7 @@ footer{background:#0B1528!important;color:#AEB6C8;border-top:3px solid var(--r)}
       <button class="btn-admin-sm btn-view" onclick="fermerAdmin()">👁 Voir le site</button>
       <button class="btn-admin-sm btn-add" onclick="ouvrirModalVoiture()">+ Ajouter voiture</button>
       <!-- Le bouton "Publier sur GitHub" n'est plus nécessaire : les données sont stockées dans Lovable Cloud et apparaissent instantanément sur tous les appareils. -->
+      <button class="btn-admin-sm" style="background:#CC1F1F;color:#fff;border:none" onclick="exporterSite()">📥 Exporter index.html à jour</button>
       <button class="btn-admin-sm btn-logout" onclick="logout()">Déconnexion</button>
     </div>
   </div>
@@ -1000,7 +1001,7 @@ const EDITABLE_TEXTS = [
 ];
 function loadSavedTexts(){
   EDITABLE_TEXTS.forEach(t=>{
-    const v=localStorage.getItem('rc_txt_'+t.id);
+    const v=localStorage.getItem('rc_txt_'+t.id)||((window.RC_EXPORT||{}).texts||{})[t.id];
     if(v){const el=document.getElementById(t.id);if(el)el.textContent=v;}
   });
 }
@@ -1780,15 +1781,34 @@ loadSavedTexts();
   const lc=()=>JSON.parse(localStorage.getItem(LC)||'null');
   const sc=()=>{try{localStorage.setItem(LC,JSON.stringify(_cars));}catch(e){alert('⚠️ Mémoire pleine : supprimez des photos anciennes ou utilisez des photos plus légères.');throw e;}};
   const _load=loadCarsFromCloud, _loadC=loadConfigFromCloud;
-  loadCarsFromCloud=async function(){ const l=lc(); if(l){_cars=l;return;} try{await _load();}catch(e){} };
-  loadConfigFromCloud=async function(){ try{await _loadC();}catch(e){} const f=JSON.parse(localStorage.getItem(LF)||'null'); if(f) _config={..._config,...f}; };
+  loadCarsFromCloud=async function(){ const l=lc()||(window.RC_EXPORT&&window.RC_EXPORT.cars); if(l){_cars=l;return;} try{await _load();}catch(e){} };
+  loadConfigFromCloud=async function(){ try{await _loadC();}catch(e){} const f=JSON.parse(localStorage.getItem(LF)||'null')||(window.RC_EXPORT&&window.RC_EXPORT.cfg); if(f) _config={..._config,...f}; };
   saveCarToCloud=async function(car){ const id=car.id||('l'+Date.now()); const i=_cars.findIndex(c=>String(c.id)===String(car.id)); const n={...car,id}; if(i>=0)_cars[i]=n; else _cars.push(n); sc(); return id; };
   deleteCarFromCloud=async function(id){ _cars=_cars.filter(c=>String(c.id)!==String(id)); sc(); };
   toggleDispoCloud=async function(id,d){ const c=_cars.find(c=>String(c.id)===String(id)); if(c)c.dispo=d; sc(); };
   saveConfigToCloud=async function(cfg){ _config={..._config,...cfg}; localStorage.setItem(LF,JSON.stringify(cfg)); };
   uploadCarImage=function(file){ return new Promise((res,rej)=>{const r=new FileReader();r.onerror=rej;r.onload=()=>{const im=new Image();im.onerror=()=>rej(new Error('Image illisible'));im.onload=()=>{const M=1400;let w=im.width,h=im.height;if(w>M){h=Math.round(h*M/w);w=M;}const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);res(cv.toDataURL('image/jpeg',0.8));};im.src=r.result;};r.readAsDataURL(file);}); };
-  const l=lc(); if(l){_cars=l; try{renderCars();}catch(e){}}
+  const l=lc()||(window.RC_EXPORT&&window.RC_EXPORT.cars); if(l){_cars=l; try{renderCars();}catch(e){}}
 })();
+async function exporterSite(){
+  try{
+    let src;
+    try{ const r=await fetch(location.pathname.endsWith('/')?location.pathname+'index.html':location.pathname,{cache:'no-store'}); if(!r.ok) throw 0; src=await r.text(); }
+    catch(e){ src='<!DOCTYPE html>\n'+document.documentElement.outerHTML; }
+    const texts={}; EDITABLE_TEXTS.forEach(t=>{const v=localStorage.getItem('rc_txt_'+t.id); if(v) texts[t.id]=v;});
+    const cfg=JSON.parse(localStorage.getItem('rc_local_cfg')||'null')||{};
+    const data={cars:_cars,cfg,texts,date:new Date().toISOString()};
+    const S='<scr'+'ipt', O=S+' id="rc-'+'export-data">', E='</scr'+'ipt>', CDN=S+' src="https://cdn.jsdelivr.net/npm/@supa'+'base';
+    const tag=O+'window.RC_EXPORT='+JSON.stringify(data).replace(/<\//g,'<\\/')+';'+E;
+    const i0=src.indexOf(O); if(i0>=0){ const i1=src.indexOf(E,i0); src=src.slice(0,i0)+src.slice(i1+E.length).replace(/^\n/,''); }
+    src=src.replace(CDN, tag+'\n'+CDN);
+    const blob=new Blob([src],{type:'text/html;charset=utf-8'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='index.html'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),30000);
+    showToast('✅ index.html téléchargé — déposez-le sur GitHub');
+  }catch(e){ alert('Erreur export : '+e.message); }
+}
+
 </script>
 </body>
 </html>
